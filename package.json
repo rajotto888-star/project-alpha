@@ -1,0 +1,17 @@
+{
+  "name": "project-alpha",
+  "private": true,
+  "version": "8.06.0",
+  "description": "Cloud-native AI orchestrator. No local compute or local runtime dependency; the browser is only the client interface and the encrypted key vault.",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r --if-present test",
+    "dev:worker": "pnpm --filter @project-alpha/worker dev",
+    "dev:web": "pnpm --filter @project-alpha/web dev",
+    "migrate:local": "pnpm --filter @project-alpha/worker migrate:dev"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  }
+}

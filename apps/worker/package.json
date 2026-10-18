@@ -1,0 +1,26 @@
+{
+  "name": "@project-alpha/worker",
+  "version": "8.06.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --env dev",
+    "deploy": "wrangler deploy --env production",
+    "migrate:dev": "wrangler d1 migrations apply DB --local --env dev",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@project-alpha/shared": "file:../../packages/shared",
+    "eventsource-parser": "^3.0.0",
+    "hono": "^4.5.0",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240909.0",
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "wrangler": "^3.78.0"
+  }
+}

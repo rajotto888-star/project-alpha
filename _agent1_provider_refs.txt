@@ -1,0 +1,200 @@
+apps/worker/test/routes.public.test.ts:5: * GET /api/providers/catalog returning 401, because providerPrefs mounted a blanket
+apps/worker/test/routes.public.test.ts:7: * catalog route. These tests pin the contract so that cannot regress.
+apps/worker/test/routes.public.test.ts:22:  manual_providers: {
+apps/worker/test/routes.public.test.ts:23:    ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/routes.public.test.ts:24:    vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/routes.public.test.ts:33:  it("GET /api/providers/catalog is PUBLIC and lists only catalog-safe fields", async () => {
+apps/worker/test/routes.public.test.ts:34:    const res = await app.request("/api/providers/catalog", { method: "GET" }, ENV);
+apps/worker/test/routes.public.test.ts:46:    // baseUrl must never be part of the public payload
+apps/worker/test/routes.public.test.ts:48:      expect(p).not.toHaveProperty("baseUrl");
+apps/worker/test/routes.public.test.ts:58:  it("POST /api/chat/stream requires a session cookie -> 401 UNAUTHENTICATED", async () => {
+apps/worker/test/routes.public.test.ts:60:      "/api/chat/stream",
+apps/worker/test/routes.public.test.ts:78:      "/api/providers/catalog",
+apps/worker/test/routes.public.test.ts:89:      "/api/providers/catalog",
+apps/worker/test/routes.public.test.ts:99:      "/api/chat/stream",
+apps/worker/test/catalog.shape.test.ts:2: * CROSS-BOUNDARY SHAPE CONTRACT — catalog payload.
+apps/worker/test/catalog.shape.test.ts:4: * Why this file exists: the catalog response is the ONE payload that is consumed by
+apps/worker/test/catalog.shape.test.ts:10: *      -> UI: "No selectable providers returned by the catalog."
+apps/worker/test/catalog.shape.test.ts:31:  const res = await app.request("/api/providers/catalog", { method: "GET" }, ENV);
+apps/worker/test/catalog.shape.test.ts:36:describe("catalog payload shape (web <-> worker contract)", () => {
+apps/worker/test/catalog.shape.test.ts:37:  it("exposes exactly the 4 public-safe keys per provider — no baseUrl, no name", async () => {
+apps/worker/test/catalog.shape.test.ts:74:    const res = await app.request("/api/providers/catalog", { method: "GET" }, ENV);
+apps/worker/test/catalog.shape.test.ts:78:    expect(raw).not.toContain("baseUrl");
+apps/worker/test/vcm.degrade.test.ts:50:      manual_providers: {
+apps/worker/test/vcm.degrade.test.ts:51:        ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/vcm.degrade.test.ts:52:        vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/ptm.midstreamErrorCode.test.ts:53:      manual_providers: {
+apps/worker/test/ptm.midstreamErrorCode.test.ts:54:        ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/ptm.midstreamErrorCode.test.ts:55:        vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/commander.paths.test.ts:57:    manual_providers: {
+apps/worker/test/commander.paths.test.ts:58:      ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/commander.paths.test.ts:59:      vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/commander.paths.test.ts:208:      manual_providers: {
+apps/worker/test/commander.paths.test.ts:209:        ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/commander.paths.test.ts:210:        vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/commander.paths.test.ts:211:        fcm: { provider_id: "groq", model_id: "llama-3.1-8b-instant" },
+apps/worker/test/pure.units.test.ts:5:import { validateManualProviders, ManualProviderValidationError } from "../src/providers/catalog";
+apps/worker/test/pure.units.test.ts:7:import type { PrefsLookup } from "../src/providers/catalog";
+apps/worker/test/pure.units.test.ts:178:describe("Manual provider validation against catalog + prefs", () => {
+apps/worker/test/pure.units.test.ts:180:    ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/pure.units.test.ts:181:    vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/pure.units.test.ts:191:      validateManualProviders({ ...manual, ptm: { provider_id: "openai", model_id: "gpt-9-turbo" } }, NO_PREFS),
+apps/worker/test/pure.units.test.ts:203:      validateManualProviders({ ...manual, fcm: { provider_id: "mistral", model_id: "x" } }, NO_PREFS),
+apps/worker/test/secretPersistence.canary.test.ts:80:      provider_id: "openai",
+apps/worker/test/secretPersistence.canary.test.ts:204:      provider_id: "openai",
+apps/worker/test/ephemeral.precedence.test.ts:34:  it("rejects a provider_id that fails ProviderIdSchema", () => {
+apps/worker/test/locks.andContracts.test.ts:84:          manual_providers: {
+apps/worker/test/locks.andContracts.test.ts:85:            ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/locks.andContracts.test.ts:86:            vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/locks.andContracts.test.ts:131:                      provider_id: "groq",
+apps/worker/test/locks.andContracts.test.ts:139:                : [{ role: "ptm", provider_id: "groq", model_id: "llama-3.3-70b-versatile" }],
+apps/worker/test/locks.andContracts.test.ts:151:    expect(res.roles.ptm).toEqual({ provider_id: "groq", model_id: "llama-3.3-70b-versatile" });
+apps/worker/test/locks.andContracts.test.ts:169:    await putRoleAssignment(db, "u1", "vcm", { provider_id: "groq", model_id: "llama-3.1-8b-instant" });
+apps/worker/test/policy.gate.test.ts:48:    manual_providers: {
+apps/worker/test/policy.gate.test.ts:49:      ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/policy.gate.test.ts:50:      vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/policy.gate.test.ts:62:  it("meta -> terminal error(phase=policy, provider_id=null), with NO done", async () => {
+apps/worker/test/policy.gate.test.ts:82:    expect(err.provider_id).toBeNull();
+apps/worker/test/orphanSession.gap.test.ts:97:              provider_id: "openai",
+apps/worker/test/ptm.usage.test.ts:95:      manual_providers: {
+apps/worker/test/ptm.usage.test.ts:96:        ptm: { provider_id: "openai", model_id: "gpt-4o" },
+apps/worker/test/ptm.usage.test.ts:97:        vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/ptm.usage.test.ts:98:        fcm: opts.fcm ? { provider_id: "openai", model_id: "gpt-4o-mini" } : null,
+apps/worker/test/chat.route.test.ts:44:    manual_providers: {
+apps/worker/test/chat.route.test.ts:45:      ptm: { provider_id: "openai", model_id: "gpt-4o-mini" },
+apps/worker/test/chat.route.test.ts:46:      vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/chat.route.test.ts:65:describe("POST /api/chat/stream — validation before the stream opens", () => {
+apps/worker/test/chat.route.test.ts:70:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:80:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:92:  it("unknown provider is rejected against the catalog -> 400", async () => {
+apps/worker/test/chat.route.test.ts:94:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:99:          manual_providers: {
+apps/worker/test/chat.route.test.ts:100:            ptm: { provider_id: "anthropic", model_id: "claude-3-5-sonnet" },
+apps/worker/test/chat.route.test.ts:101:            vcm: { provider_id: "groq", model_id: "llama-3.3-70b-versatile" },
+apps/worker/test/chat.route.test.ts:114:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:124:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:142:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:163:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:178:      "/api/chat/stream",
+apps/worker/test/chat.route.test.ts:198:      "/api/chat/stream",
+apps/worker/src/providers/catalog.ts:3:  baseUrl: string;
+apps/worker/src/providers/catalog.ts:12:    baseUrl: "https://api.openai.com/v1",
+apps/worker/src/providers/catalog.ts:19:    baseUrl: "https://api.groq.com/openai/v1",
+apps/worker/src/providers/catalog.ts:29:    baseUrl: "https://<REAL-GATEWAY>/v1",
+apps/worker/src/providers/catalog.ts:36:    baseUrl: "https://<REAL-GATEWAY>/v1",
+apps/worker/src/providers/catalog.ts:41:  { id: "gemini", baseUrl: "", models: [], implemented: false, selectable: false },
+apps/worker/src/providers/catalog.ts:42:  { id: "anthropic", baseUrl: "", models: [], implemented: false, selectable: false },
+apps/worker/src/providers/catalog.ts:43:  { id: "deepseek", baseUrl: "", models: [], implemented: false, selectable: false },
+apps/worker/src/providers/catalog.ts:44:  { id: "mistral", baseUrl: "", models: [], implemented: false, selectable: false },
+apps/worker/src/providers/catalog.ts:58:  ref: { provider_id: string; model_id: string } | null,
+apps/worker/src/providers/catalog.ts:67:  const entry = getCatalogProvider(ref.provider_id);
+apps/worker/src/providers/catalog.ts:69:    throw new ManualProviderValidationError(`${roleName} provider not available: ${ref.provider_id}`);
+apps/worker/src/providers/catalog.ts:74:  if (prefs.isDisabled(ref.provider_id)) {
+apps/worker/src/providers/catalog.ts:75:    throw new ManualProviderValidationError(`${roleName} provider disabled by user: ${ref.provider_id}`);
+apps/worker/src/providers/catalog.ts:81:    fcm: { provider_id: string; model_id: string } | null;
+apps/worker/src/providers/catalog.ts:82:    ptm: { provider_id: string; model_id: string };
+apps/worker/src/providers/catalog.ts:83:    vcm: { provider_id: string; model_id: string };
+apps/worker/src/lib/ssrfGuard.ts:2:// Placeholder — deferred per §5 upgrade policy. True BYOE (user-supplied baseUrl) needs SSRF guard.
+apps/worker/src/routes/providerPrefs.ts:5:import { getCatalogProvider } from "../providers/catalog";
+apps/worker/src/routes/providerPrefs.ts:11:// catalog route mounted at the same /api/providers prefix in index.ts.
+apps/worker/src/routes/providerPrefs.ts:44:    const entry = getCatalogProvider(ref.provider_id);
+apps/worker/src/routes/chat.ts:4:import { validateManualProviders, type PrefsLookup, ManualProviderValidationError } from "../providers/catalog";
+apps/worker/src/routes/chat.ts:25:  const disabled = new Set(prefsResult.provider_prefs.filter((p) => !p.enabled).map((p) => p.provider_id));
+apps/worker/src/routes/chat.ts:29:    validateManualProviders(payload.manual_providers, prefsLookup);
+apps/worker/src/routes/chat.ts:54:    payload.manual_providers.ptm,
+apps/worker/src/routes/chat.ts:55:    payload.manual_providers.vcm,
+apps/worker/src/routes/chat.ts:56:    ...(payload.manual_providers.fcm ? [payload.manual_providers.fcm] : []),
+apps/worker/src/routes/chat.ts:59:    if (!ephemeralKeys[ref.provider_id]) {
+apps/worker/src/routes/chat.ts:61:        { error_code: ERROR_CODES.MISSING_CREDENTIALS, message: `missing ephemeral key for ${ref.provider_id}` },
+apps/worker/src/routes/catalog.ts:2:import { PROVIDER_CATALOG } from "../providers/catalog";
+apps/worker/src/routes/catalog.ts:5:const catalog = new Hono<PublicEnv>();
+apps/worker/src/routes/catalog.ts:8:catalog.get("/catalog", (c) => {
+apps/worker/src/routes/catalog.ts:18:export default catalog;
+apps/worker/src/db/providerPrefs.ts:14:// LOCKED design Option A: provider_prefs(user_id,provider_id) PLUS separate
+apps/worker/src/db/providerPrefs.ts:19:      `SELECT provider_id, enabled, selected_model, priority_mode, cost_weight, quota_hint_daily
+apps/worker/src/db/providerPrefs.ts:24:      provider_id: string;
+apps/worker/src/db/providerPrefs.ts:33:    provider_id: r.provider_id,
+apps/worker/src/db/providerPrefs.ts:42:    .prepare(`SELECT role, provider_id, model_id FROM role_assignments WHERE user_id = ?`)
+apps/worker/src/db/providerPrefs.ts:44:    .all<{ role: string; provider_id: string; model_id: string }>();
+apps/worker/src/db/providerPrefs.ts:48:    const ref: ModelRef = { provider_id: row.provider_id, model_id: row.model_id };
+apps/worker/src/db/providerPrefs.ts:66:        `INSERT INTO provider_prefs (user_id, provider_id, enabled, selected_model, priority_mode, cost_weight, quota_hint_daily, updated_at)
+apps/worker/src/db/providerPrefs.ts:68:         ON CONFLICT(user_id, provider_id) DO UPDATE SET
+apps/worker/src/db/providerPrefs.ts:78:        p.provider_id,
+apps/worker/src/db/providerPrefs.ts:110:      `INSERT INTO role_assignments (user_id, role, provider_id, model_id, updated_at)
+apps/worker/src/db/providerPrefs.ts:113:         provider_id = excluded.provider_id,
+apps/worker/src/db/providerPrefs.ts:117:    .bind(userId, role, ref.provider_id, ref.model_id, now)
+apps/worker/src/db/audit.ts:5:  provider_id: string | null;
+apps/worker/src/db/audit.ts:21:       (id, user_id, request_id, provider_id, model_id, status, latency_ms, token_estimate, cost_estimate, phase, error_code, created_at)
+apps/worker/src/db/audit.ts:28:      ev.provider_id,
+apps/worker/src/orchestrator/emitter.ts:17:      fcm: { provider_id: string; model_id: string } | null;
+apps/worker/src/orchestrator/emitter.ts:18:      ptm: { provider_id: string; model_id: string };
+apps/worker/src/orchestrator/emitter.ts:19:      vcm: { provider_id: string; model_id: string };
+apps/worker/src/orchestrator/emitter.ts:38:    provider_id: string | null;
+apps/worker/src/orchestrator/emitter.ts:75:      fcm: { provider_id: string; model_id: string } | null;
+apps/worker/src/orchestrator/emitter.ts:76:      ptm: { provider_id: string; model_id: string };
+apps/worker/src/orchestrator/emitter.ts:77:      vcm: { provider_id: string; model_id: string };
+apps/worker/src/orchestrator/emitter.ts:88:      manual_providers: manualProviders,
+apps/worker/src/orchestrator/emitter.ts:163:    provider_id: string | null;
+apps/worker/src/orchestrator/emitter.ts:178:      provider_id: args.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:28:  emitter.meta(requestId, payload.manual_providers);
+apps/worker/src/orchestrator/runCommander.ts:37:      provider_id: null,
+apps/worker/src/orchestrator/runCommander.ts:43:      provider_id: null,
+apps/worker/src/orchestrator/runCommander.ts:58:  if (payload.enable_fast_draft && payload.manual_providers.fcm) {
+apps/worker/src/orchestrator/runCommander.ts:59:    const fcmRef = payload.manual_providers.fcm;
+apps/worker/src/orchestrator/runCommander.ts:67:        const config = resolveProviderConfig(fcmRef.provider_id, ephemeralKeys);
+apps/worker/src/orchestrator/runCommander.ts:79:          provider_id: fcmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:94:        provider_id: fcmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:105:  const ptmRef = payload.manual_providers.ptm;
+apps/worker/src/orchestrator/runCommander.ts:112:      providerId: ptmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:140:      provider_id: ptmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:146:      provider_id: ptmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:162:  const vcmRef = payload.manual_providers.vcm;
+apps/worker/src/orchestrator/runCommander.ts:168:      providerId: vcmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:183:      provider_id: vcmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:196:      provider_id: vcmRef.provider_id,
+apps/worker/src/orchestrator/runCommander.ts:235:    provider_id: ptmRef.provider_id,
+apps/worker/src/index.ts:6:import catalogRoute from "./routes/catalog";
+apps/worker/src/index.ts:19:// BUG 1 fix: catalog (public) mounted BEFORE providerPrefs (authed) at the
+apps/worker/src/index.ts:20:// same "/api/providers" prefix so the auth guard never shadows /catalog.
+apps/worker/src/index.ts:21:app.route("/api/providers", catalogRoute);
+apps/worker/src/adapters/vcm.ts:113:      const res = await fetch(`${config.baseUrl}/chat/completions`, {
+apps/worker/src/adapters/openaiCompat.ts:3:import { PROVIDER_CATALOG, getCatalogProvider } from "../providers/catalog";
+apps/worker/src/adapters/openaiCompat.ts:14:  baseUrl: string;
+apps/worker/src/adapters/openaiCompat.ts:18:// LOCKED (B3): baseUrl is resolved exclusively from PROVIDER_CATALOG — never
+apps/worker/src/adapters/openaiCompat.ts:24:  const catalogEntry = getCatalogProvider(providerId);
+apps/worker/src/adapters/openaiCompat.ts:25:  if (!catalogEntry || !catalogEntry.implemented || !catalogEntry.selectable) {
+apps/worker/src/adapters/openaiCompat.ts:32:  return { providerId, baseUrl: catalogEntry.baseUrl, apiKey };
+apps/worker/src/adapters/openaiCompat.ts:106:      const res = await fetch(`${config.baseUrl}/chat/completions`, {
+apps/web/test/keysPanel.test.tsx:112:  it("lists only selectable providers from the public catalog", async () => {
+apps/web/test/keysPanel.test.tsx:169:  it("surfaces a catalog failure instead of crashing", async () => {
+apps/web/test/keysPanel.test.tsx:175:    expect(container.textContent).toContain("Could not load the provider catalog.");
+apps/web/test/vault.test.ts:180:  it("returns base64 JSON keyed by provider_id that decodes back to the exact keys", () => {
+apps/web/test/sseClient.test.ts:33:      "/api/chat/stream",
+apps/web/test/sseClient.test.ts:43:    expect(url).toBe("/api/chat/stream");
+apps/web/test/sseClient.test.ts:55:    const ctrl = streamChat("/api/chat/stream", {}, {}, { onEvent: () => {} });
+apps/web/test/sseClient.test.ts:82:    streamChat("/api/chat/stream", {}, {}, {
+apps/web/test/sseClient.test.ts:114:    streamChat("/api/chat/stream", {}, {}, { onEvent: (e) => seen.push(e.type) });
+apps/web/test/sseClient.test.ts:136:    streamChat("/api/chat/stream", {}, {}, {
+apps/web/test/sseClient.test.ts:166:    streamChat("/api/chat/stream", {}, {}, {
+apps/web/test/sseClient.test.ts:188:    streamChat("/api/chat/stream", {}, {}, {
+apps/web/test/sseClient.test.ts:212:    const ctrl = streamChat("/api/chat/stream", {}, {}, {
+apps/web/src/components/ProviderSettings.tsx:11:  provider_id: string;
+apps/web/src/components/ProviderSettings.tsx:22:  const [catalog, setCatalog] = useState<CatalogProvider[]>([]);
+apps/web/src/components/ProviderSettings.tsx:24:  const [roles, setRoles] = useState<Record<string, { provider_id: string; model_id: string } | null>>({});
+apps/web/src/components/ProviderSettings.tsx:29:      fetch("/api/providers/catalog", { credentials: "include" }).then((r) => r.json()),
+apps/web/src/components/ProviderSettings.tsx:48:          provider_id: p.provider_id,
+apps/web/src/components/ProviderSettings.tsx:60:  async function setRole(role: Role, provider_id: string, model_id: string) {
+apps/web/src/components/ProviderSettings.tsx:62:    const body = provider_id ? { provider_id, model_id } : null;
+apps/web/src/components/ProviderSettings.tsx:73:  const selectable = catalog.filter((p) => p.implemented && p.selectable);
+apps/web/src/components/ProviderSettings.tsx:78:      {selectable.length === 0 ? <p>No selectable providers returned by the catalog.</p> : null}
+apps/web/src/components/ProviderSettings.tsx:81:        const row = prefs.find((r) => r.provider_id === p.id);
+apps/web/src/components/ProviderSettings.tsx:90:                    const others = prev.filter((x) => x.provider_id !== p.id);
+apps/web/src/components/ProviderSettings.tsx:94:                        provider_id: p.id,
+apps/web/src/components/ProviderSettings.tsx:113:                    prev.map((x) => (x.provider_id === p.id ? { ...x, selected_model: e.target.value } : x)),
+apps/web/src/components/ProviderSettings.tsx:130:                    prev.map((x) => (x.provider_id === p.id ? { ...x, priority_mode: e.target.value } : x)),
+apps/web/src/components/ProviderSettings.tsx:150:                      x.provider_id === p.id ? { ...x, cost_weight: Number(e.target.value) } : x,
+apps/web/src/components/ProviderSettings.tsx:169:              value={current ? `${current.provider_id}:${current.model_id}` : ""}
+apps/web/src/components/KeysPanel.tsx:5:/** Public catalog row shape (string models, no baseUrl — see GET /api/providers/catalog). */
+apps/web/src/components/KeysPanel.tsx:27:    fetch("/api/providers/catalog", { credentials: "include" })
+apps/web/src/components/KeysPanel.tsx:34:      .catch(() => setStatus("Could not load the provider catalog."));
+apps/web/src/components/BYOEEndpointInput.tsx:2:// Placeholder — deferred. True BYOE (user-supplied endpoint) needs UI for custom baseUrl + validation.

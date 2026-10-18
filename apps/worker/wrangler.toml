@@ -1,0 +1,24 @@
+name = "project-alpha-worker"
+main = "src/index.ts"
+compatibility_date = "2024-09-01"
+[assets]
+directory = "../web/dist"
+[[d1_databases]]
+binding = "DB"
+database_name = "project-alpha-db-prod"
+database_id = "e7305237-ad7a-427e-aa8f-e92d88a4692e"
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "b8875868489c44c9baafc9fdb92587ee"
+[env.production]
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "project-alpha-db-prod"
+database_id = "e7305237-ad7a-427e-aa8f-e92d88a4692e"
+[[env.production.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "b8875868489c44c9baafc9fdb92587ee"
+[env.production.vars]
+APP_URL = "https://project-alpha-worker-production.rajotto888.workers.dev"
+APP_ORIGIN = "https://project-alpha-worker-production.rajotto888.workers.dev"
+COOKIE_SECURE = "true"

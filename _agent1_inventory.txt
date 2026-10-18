@@ -1,0 +1,10 @@
+./.github/workflows/ci.yml
+./README.md
+./STATUS_V8.06.md
+./TRANSFER_NOTE.md
+./apps/worker/wrangler.toml
+./docs/LOCKED_BEHAVIORS.md
+./docs/PROVIDER_STRATEGY_OPENROUTER_THEN_CUSTOM.md
+./pnpm-lock.yaml
+./pnpm-workspace.yaml
+./verify.sh

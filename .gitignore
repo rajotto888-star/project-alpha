@@ -1,0 +1,32 @@
+# --- secrets: NEVER commit ---
+# wrangler reads local secrets from .dev.vars by convention. This file exists
+# precisely so real values stay out of git; losing this entry leaks every key.
+.dev.vars
+*.env
+.env
+.env.*
+!.env.example
+
+# --- wrangler local state (local D1/KV/R2 databases, caches) ---
+.wrangler/
+
+# --- build / dependency output ---
+node_modules/
+dist/
+out/
+build/
+*.tsbuildinfo
+
+# --- tooling caches ---
+.turbo/
+.cache/
+.vite/
+coverage/
+.pytest_cache/
+
+# --- editor / OS noise ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
