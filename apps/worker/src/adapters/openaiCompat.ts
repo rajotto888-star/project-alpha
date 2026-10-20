@@ -1,6 +1,7 @@
 import { createParser, type EventSourceMessage } from "eventsource-parser";
 import { AsyncQueue } from "./asyncQueue";
 import { PROVIDER_CATALOG, getCatalogProvider } from "../providers/catalog";
+import { assertSafeUrl, SsrfGuardError } from "../lib/ssrfGuard";
 
 export class UpstreamConfigError extends Error {}
 export class UpstreamHTTPError extends Error {
@@ -17,6 +18,7 @@ export interface ResolvedProviderConfig {
 
 // LOCKED (B3): baseUrl is resolved exclusively from PROVIDER_CATALOG — never
 // duplicated as a scattered constant elsewhere.
+// SECURITY: ephemeral header-first, SSRF guard for custom baseUrl (hf-space/colab/kaggle/private-*).
 export function resolveProviderConfig(
   providerId: string,
   ephemeralKeys: Record<string, string>,
@@ -28,6 +30,16 @@ export function resolveProviderConfig(
   const apiKey = ephemeralKeys[providerId];
   if (!apiKey) {
     throw new UpstreamConfigError(`missing ephemeral key for provider: ${providerId}`);
+  }
+  // SSRF guard: all baseUrls must be https and non-private, especially for custom free-compute gateway
+  // This ensures vault ephemeral keys are only sent to safe public endpoints.
+  try {
+    assertSafeUrl(catalogEntry.baseUrl);
+  } catch (e) {
+    if (e instanceof SsrfGuardError) {
+      throw new UpstreamConfigError(`SSRF guard blocked baseUrl for ${providerId}: ${e.message}`);
+    }
+    throw e;
   }
   return { providerId, baseUrl: catalogEntry.baseUrl, apiKey };
 }

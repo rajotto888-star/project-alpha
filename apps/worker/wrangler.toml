@@ -1,24 +1,60 @@
 name = "project-alpha-worker"
 main = "src/index.ts"
 compatibility_date = "2024-09-01"
+
 [assets]
 directory = "../web/dist"
+
 [[d1_databases]]
 binding = "DB"
-database_name = "project-alpha-db-prod"
-database_id = "e7305237-ad7a-427e-aa8f-e92d88a4692e"
+database_name = "project-alpha-db"
+database_id = "2438ac15-27ad-4c66-9295-9ff7baaeae71"
+
 [[kv_namespaces]]
 binding = "OAUTH_KV"
-id = "b8875868489c44c9baafc9fdb92587ee"
+id = "f382c68afec247c1bba17ae7cf5952b0"
+
+[env.dev]
+[[env.dev.d1_databases]]
+binding = "DB"
+database_name = "project-alpha-db-dev"
+database_id = "cc7f793e-3e04-4822-a418-57a9a1ad3f82"
+preview_database_id = "cc7f793e-3e04-4822-a418-57a9a1ad3f82"
+
+[[env.dev.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "dcb35802075744838beda8d26f5d6cbc"
+preview_id = "520c23662df44d31bf6708a61a646d2a"
+
+[env.dev.vars]
+APP_URL = "http://127.0.0.1:8787"
+APP_ORIGIN = "http://127.0.0.1:5173"
+COOKIE_SECURE = "false"
+
 [env.production]
 [[env.production.d1_databases]]
 binding = "DB"
 database_name = "project-alpha-db-prod"
 database_id = "e7305237-ad7a-427e-aa8f-e92d88a4692e"
+
 [[env.production.kv_namespaces]]
 binding = "OAUTH_KV"
 id = "b8875868489c44c9baafc9fdb92587ee"
+
 [env.production.vars]
 APP_URL = "https://project-alpha-worker-production.rajotto888.workers.dev"
 APP_ORIGIN = "https://project-alpha-worker-production.rajotto888.workers.dev"
 COOKIE_SECURE = "true"
+
+# --- free-compute gateway ---
+# hf-space: https://your-space.hf.space/v1 (semi-stable)
+# colab: https://xxxx.trycloudflare.com/v1 (ephemeral T4)
+# kaggle: https://xxxx.trycloudflare.com/v1 (ephemeral T4 x2)
+# SSRF guard hardened in src/lib/ssrfGuard.ts
+# Ephemeral header-first: X-EPHEMERAL-KEYS base64 JSON
+# No secret persistence: vault encrypted in IndexedDB only
+# Catalog: 12 providers 46 models (groq 6 + openrouter 26 + private-llama 2 + private-smollm 2 + hf-space 3 + colab 3 + kaggle 2 + openai 2)
+# Version: 94b4644a-5156-4179-ae9c-37c332ed7f48 live 2026-10-20
+# D1 prod e7305237-ad7a-427e-aa8f-e92d88a4692e
+# KV prod b8875868489c44c9baafc9fdb92587ee
+# END

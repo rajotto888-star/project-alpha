@@ -1,1 +1,55 @@
-[ "poolside/laguna-s-2.1:free", "cohere/north-mini-code:free", "poolside/laguna-xs-2.1:free", "nvidia/nemotron-3-ultra-550b-a55b:free", "nvidia/nemotron-3-super-120b-a12b:free", "nvidia/nemotron-3.5-lightning:free", "apodex/apodex-1.1-mini:free", "thinkingmachines/inkling:free", "thinkingmachines/inkling-small:free", "qwen/qwen3.8-27b:free", "google/gemma-4-31b-it:free", "google/gemma-4-26b-a4b-it:free", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free", "dots-studio/dots-3-note-preview:free", "inclusionai/ling-3.0-flash-sante:free", "liquid/lfm-2.5-2.6b:free", "nvidia/nemotron-3.5-content-safety:free", "openrouter/free" ]
+{
+  "openrouter_free": [
+    "poolside/laguna-s-2.1:free",
+    "cohere/north-mini-code:free",
+    "poolside/laguna-xs-2.1:free",
+    "nvidia/nemotron-3-ultra-550b-a55b:free",
+    "nvidia/nemotron-3-super-120b-a12b:free",
+    "nvidia/nemotron-3.5-lightning:free",
+    "apodex/apodex-1.1-mini:free",
+    "thinkingmachines/inkling:free",
+    "thinkingmachines/inkling-small:free",
+    "qwen/qwen3.8-27b:free",
+    "google/gemma-4-31b-it:free",
+    "google/gemma-4-26b-a4b-it:free",
+    "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+    "dots-studio/dots-3-note-preview:free",
+    "inclusionai/ling-3.0-flash-sante:free",
+    "liquid/lfm-2.5-2.6b:free",
+    "nvidia/nemotron-3.5-content-safety:free",
+    "openrouter/free"
+  ],
+  "hf_space": {
+    "provider": "hf-space",
+    "baseUrl": "https://your-space.hf.space/v1",
+    "models": ["smollm2-1.7b-instruct", "smollm2-360m-instruct", "llama-3.2-3b-instruct"],
+    "cost": "free CPU / ZeroGPU",
+    "how_to": "Deploy free-compute-templates/hf-space/ as Docker SDK Space, set MODEL_ID env, URL is https://<space>.hf.space/v1",
+    "docs": "https://huggingface.co/docs/hub/spaces-overview"
+  },
+  "colab": {
+    "provider": "colab",
+    "baseUrl": "https://xxxx.trycloudflare.com/v1",
+    "models": ["llama-3.2-3b-instruct", "llama-3.3-70b-instruct", "qwen/qwen3-8b"],
+    "cost": "free T4 12h/session",
+    "how_to": "Run free-compute-templates/colab/colab_kaggle_openai_server.py in Colab, copy tunnel URL",
+    "docs": "https://colab.research.google.com/ - GPU T4 free"
+  },
+  "kaggle": {
+    "provider": "kaggle",
+    "baseUrl": "https://xxxx.trycloudflare.com/v1",
+    "models": ["llama-3.2-3b-instruct", "llama-3.3-70b-instruct"],
+    "cost": "free T4 x2 30h/week",
+    "how_to": "Run free-compute-templates/kaggle/colab_kaggle_openai_server.py in Kaggle Notebook with Internet ON + GPU T4 x2",
+    "docs": "https://www.kaggle.com/code - free GPU"
+  },
+  "groq_free": {
+    "provider": "groq",
+    "models": ["openai/gpt-oss-20b", "qwen/qwen3-8b", "llama-3.1-8b-instant"],
+    "cost": "free tier 14,400 req/day"
+  },
+  "gateway": {
+    "stable": "https://alpha-llm-gateway.rajotto888.workers.dev/v1",
+    "registry": "free-compute-templates/registry.json"
+  }
+}

@@ -36,7 +36,7 @@ async function getCatalog() {
 describe("catalog payload shape (web <-> worker contract)", () => {
   it("exposes exactly the 4 public-safe keys per provider — no baseUrl, no name", async () => {
     const body = await getCatalog();
-    expect(body.providers.length).toBe(9);
+    expect(body.providers.length).toBe(12);
     for (const p of body.providers) {
       expect(Object.keys(p).sort()).toEqual(["id", "implemented", "models", "selectable"]);
     }
@@ -56,7 +56,16 @@ describe("catalog payload shape (web <-> worker contract)", () => {
   it("selectable providers are openai + groq, each with >= 1 model", async () => {
     const body = await getCatalog();
     const selectable = body.providers.filter((p) => p.implemented && p.selectable);
-    expect(selectable.map((p) => p.id).sort()).toEqual(["groq", "openai", "openrouter", "private-llama", "private-smollm"]);
+    expect(selectable.map((p) => p.id).sort()).toEqual([
+      "colab",
+      "groq",
+      "hf-space",
+      "kaggle",
+      "openai",
+      "openrouter",
+      "private-llama",
+      "private-smollm",
+    ]);
     for (const p of selectable) expect(p.models.length).toBeGreaterThan(0);
   });
 

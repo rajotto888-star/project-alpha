@@ -41,7 +41,16 @@ describe("Public vs protected routes (regression)", () => {
     expect(ids).toContain("groq");
 
     const selectable = body.providers.filter((p: any) => p.selectable);
-    expect(selectable.map((p: any) => p.id).sort()).toEqual(["groq", "openai", "openrouter", "private-llama", "private-smollm"]);
+    expect(selectable.map((p: any) => p.id).sort()).toEqual([
+      "colab",
+      "groq",
+      "hf-space",
+      "kaggle",
+      "openai",
+      "openrouter",
+      "private-llama",
+      "private-smollm",
+    ]);
 
     // baseUrl must never be part of the public payload
     for (const p of body.providers) {
