@@ -76,6 +76,38 @@ export const PROVIDER_CATALOG: CatalogProvider[] = [
     selectable: true,
   },
   {
+    id: "hf-space",
+    baseUrl: "https://your-space.hf.space/v1",
+    models: [
+      "smollm2-1.7b-instruct",
+      "smollm2-360m-instruct",
+      "llama-3.2-3b-instruct"
+    ],
+    implemented: true,
+    selectable: true,
+  },
+  {
+    id: "colab",
+    baseUrl: "https://xxxx.trycloudflare.com/v1",
+    models: [
+      "llama-3.2-3b-instruct",
+      "llama-3.3-70b-instruct",
+      "qwen/qwen3-8b"
+    ],
+    implemented: true,
+    selectable: true,
+  },
+  {
+    id: "kaggle",
+    baseUrl: "https://xxxx.trycloudflare.com/v1",
+    models: [
+      "llama-3.2-3b-instruct",
+      "llama-3.3-70b-instruct"
+    ],
+    implemented: true,
+    selectable: true,
+  },
+  {
     id: "openai",
     baseUrl: "https://api.openai.com/v1",
     models: ["gpt-4o-mini", "gpt-4o"],

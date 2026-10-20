@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "stable_gateway": "https://alpha-llm-gateway.rajotto888.workers.dev/v1",
+  "nodes": {
+    "hf-space-smollm": {
+      "type": "semi-stable",
+      "url": "https://your-username-project-alpha-smollm.hf.space/v1",
+      "models": ["smollm2-1.7b-instruct", "smollm2-360m-instruct"],
+      "status": "template - deploy to HF Spaces",
+      "cost": "free CPU / ZeroGPU"
+    },
+    "colab-burst": {
+      "type": "ephemeral",
+      "url": "https://xxxx.trycloudflare.com/v1",
+      "models": ["llama-3.2-3b-instruct", "llama-3.3-70b-instruct"],
+      "status": "on-demand - run colab_kaggle_openai_server.py in Colab",
+      "cost": "free T4 12h",
+      "how_to_update": "Copy tunnel URL from Colab output and paste into Provider Settings > colab"
+    },
+    "kaggle-burst": {
+      "type": "ephemeral",
+      "url": "https://xxxx.trycloudflare.com/v1",
+      "models": ["llama-3.2-3b-instruct"],
+      "status": "on-demand - run in Kaggle with GPU T4 x2",
+      "cost": "free 30h weekly"
+    }
+  }
+}
