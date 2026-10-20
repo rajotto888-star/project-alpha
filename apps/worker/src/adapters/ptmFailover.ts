@@ -18,6 +18,7 @@ export interface PtmRunArgs {
   /** Opt into upstream stream usage; reported only for the attempt that succeeds. */
   includeUsage?: boolean;
   onUsage?: (usage: { total_tokens: number }) => void;
+  customEndpoints?: Record<string, string>;
 }
 
 // LOCKED: retry/failover allowed only before the first successfully emitted
@@ -45,7 +46,7 @@ export async function runPtmWithFailover(args: PtmRunArgs): Promise<void> {
     args.parentSignal.addEventListener("abort", onParentAbort);
 
     try {
-      const config: ResolvedProviderConfig = resolveProviderConfig(args.providerId, args.ephemeralKeys);
+      const config: ResolvedProviderConfig = resolveProviderConfig(args.providerId, args.ephemeralKeys, args.customEndpoints);
       // Per-attempt sink: a failed attempt must never leak its usage to the caller.
       const attemptUsage: { total_tokens?: number } = {};
       for await (const chunk of streamOpenAICompat(config, args.modelId, args.messages, controller.signal, {

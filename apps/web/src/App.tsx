@@ -107,30 +107,38 @@ export function App() {
           Your provider keys live only in this browser, encrypted with AES-GCM. Nothing is ever
           sent to or stored on the server.
         </p>
-        <p style={{ fontSize: 12, color: "#666" }}>
-          Auto-login: {autoLoggedIn ? "✅ default-user (123456)" : "⏳ connecting..."} {authNotice ? `- ${authNotice}` : ""}
-        </p>
-        <input
-          type="password"
-          value={passphrase}
-          placeholder="Vault passphrase"
-          onChange={(e) => {
-            setPassphrase(e.target.value);
-            setCreateConfirm(false);
-          }}
-          style={{ width: "100%", padding: 8, marginBottom: 8 }}
-        />
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={handleUnlock} disabled={!passphrase}>Unlock</button>
-          <button onClick={handleCreate} disabled={!passphrase}>Create new vault</button>
+        {/* Auto-login happens silently in background - no UI clutter, only password option visible */}
+        <div style={{ background: "#f5f5f5", padding: 12, borderRadius: 8, marginBottom: 16 }}>
+          <label style={{ display: "block", fontSize: 14, fontWeight: 600, marginBottom: 6 }}>Vault passphrase</label>
+          <input
+            type="password"
+            value={passphrase}
+            placeholder="Enter your vault password"
+            onChange={(e) => {
+              setPassphrase(e.target.value);
+              setCreateConfirm(false);
+            }}
+            style={{ width: "100%", padding: 10, marginBottom: 10, borderRadius: 6, border: "1px solid #ccc" }}
+            onKeyDown={(e) => { if (e.key === "Enter" && passphrase) handleUnlock(); }}
+          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={handleUnlock} disabled={!passphrase} style={{ padding: "8px 16px", fontWeight: 600 }}>Unlock</button>
+            <button onClick={handleCreate} disabled={!passphrase} style={{ padding: "8px 16px" }}>Create new vault</button>
+          </div>
+          {notice ? <p role="alert" style={{ color: "#b00", marginTop: 8 }}>{notice}</p> : null}
+          <p style={{ fontSize: 11, color: "#888", marginTop: 8 }}>Your keys are encrypted locally with AES-GCM. No server storage.</p>
         </div>
-        {notice ? <p role="alert">{notice}</p> : null}
-        <div style={{ marginTop: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button onClick={handleAutoLogin}>Auto-login (123456)</button>
-          <button onClick={handleSignIn}>Sign in with Google</button>
-          <button onClick={handleSignOut}>Sign out</button>
-        </div>
-        {authNotice ? <p style={{ fontSize: 12 }}>{authNotice}</p> : null}
+        {/* Advanced login hidden behind details - only password option by default */}
+        <details style={{ fontSize: 12 }}>
+          <summary style={{ cursor: "pointer", color: "#666" }}>Advanced login (Google / Auto-login)</summary>
+          <div style={{ marginTop: 8, display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button onClick={handleAutoLogin}>Auto-login (123456)</button>
+            <button onClick={handleSignIn}>Sign in with Google</button>
+            <button onClick={handleSignOut}>Sign out</button>
+          </div>
+          <p style={{ fontSize: 11, color: "#666" }}>{autoLoggedIn ? "✅ default-user (123456)" : "⏳ connecting..."} {authNotice ? `- ${authNotice}` : ""}</p>
+          {authNotice ? <p style={{ fontSize: 12 }}>{authNotice}</p> : null}
+        </details>
       </main>
     );
   }

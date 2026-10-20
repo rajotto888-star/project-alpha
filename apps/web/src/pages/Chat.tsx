@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Correction, Message, PatchPayload } from "@project-alpha/shared";
 import { streamChat } from "../lib/sseClient";
 import { ApplyCorrections } from "../components/ApplyCorrections";
@@ -43,7 +43,18 @@ export function Chat({ vault }: { vault: Vault }) {
   const [patch, setPatch] = useState<PatchPayload | null>(null);
   const [loading, setLoading] = useState(false);
   const [terminalErrorMsg, setTerminalErrorMsg] = useState<string | null>(null);
+  const [roles, setRoles] = useState<{ ptm: { provider_id: string; model_id: string } | null; vcm: { provider_id: string; model_id: string } | null; fcm: { provider_id: string; model_id: string } | null }>({ ptm: null, vcm: null, fcm: null });
   const abortRef = useRef<{ abort: () => void } | null>(null);
+
+  // Load roles from API - fixes "chat reply asce na" when roles not set
+  useEffect(() => {
+    fetch("/api/providers/prefs", { credentials: "include" })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.roles) setRoles(data.roles);
+      })
+      .catch(() => {});
+  }, []);
 
   function runStream(messageList: Message[]) {
     setLoading(true);
@@ -51,8 +62,14 @@ export function Chat({ vault }: { vault: Vault }) {
     setPatch(null);
     setTerminalErrorMsg(null);
 
-    // Ephemeral key precedence: header first (if it fits under the size
-    // threshold), otherwise fall back to body keys. Never persisted server-side.
+    const availableKeys = vault.listProviders();
+    if (availableKeys.length === 0) {
+      setLoading(false);
+      setTerminalErrorMsg("No provider keys saved. Go to Keys tab and add at least groq or openrouter key.");
+      return;
+    }
+
+    // Ephemeral key precedence: header first (if it fits under the size threshold), otherwise fall back to body keys. Never persisted server-side.
     const headerValue = vault.buildEphemeralHeader();
     const headers: Record<string, string> = {};
     let bodyKeys: Record<string, string> | undefined;
@@ -62,20 +79,47 @@ export function Chat({ vault }: { vault: Vault }) {
       bodyKeys = vault.getKeysForBody();
     }
 
+    // Custom endpoints from localStorage (Android Private LM / Colab tunnel / HF Space)
+    try {
+      const customEndpoints = JSON.parse(localStorage.getItem("custom_endpoints") || "{}");
+      if (Object.keys(customEndpoints).length > 0) {
+        headers["X-CUSTOM-ENDPOINTS"] = btoa(JSON.stringify(customEndpoints));
+      }
+    } catch {}
+
+    // Determine manual_providers dynamically - fixes chat not replying when hardcoded providers missing keys
+    let ptm = roles.ptm;
+    let vcm = roles.vcm;
+    let fcm = roles.fcm;
+
+    // Fallback logic: use first available key provider if role not set or key missing
+    const firstAvailable = availableKeys[0];
+    const getFallback = (preferred: { provider_id: string; model_id: string } | null, fallbackModel: string) => {
+      if (preferred && availableKeys.includes(preferred.provider_id)) return preferred;
+      // Find a provider that has key and has models
+      if (availableKeys.includes("groq")) return { provider_id: "groq", model_id: "llama-3.3-70b-versatile" };
+      if (availableKeys.includes("openrouter")) return { provider_id: "openrouter", model_id: "deepseek/deepseek-r1-free" };
+      if (availableKeys.includes("openai")) return { provider_id: "openai", model_id: "gpt-4o-mini" };
+      if (availableKeys.includes("private-llama")) return { provider_id: "private-llama", model_id: "llama-3.2-3b-instruct" };
+      if (availableKeys.includes("hf-space")) return { provider_id: "hf-space", model_id: "smollm2-1.7b-instruct" };
+      // Last resort: use first available with its first model (will be validated server-side)
+      return { provider_id: firstAvailable, model_id: fallbackModel };
+    };
+
+    const finalPtm = getFallback(ptm, "llama-3.3-70b-versatile");
+    const finalVcm = getFallback(vcm, "llama-3.3-70b-versatile");
+    // FCM is optional - only use if key available
+    const finalFcm = fcm && availableKeys.includes(fcm.provider_id) ? fcm : null;
+
     const body = {
       messages: messageList,
-      // BYOE Lite (step 129): selectable now = openai, groq, private-llama, private-smollm
-      // PTM/VCM default to openai/groq for first launch; switch to private-llama after Keys saved.
-      // To enable fast-draft: fcm: { provider_id: "openrouter", model_id: "qwen/qwen-2.5-7b-instruct-free" }
-      // LEVEL-1 3-model pipeline: PTM draft (openrouter fast), VCM verify (groq strong), FCM final format (openrouter cheap)
-      // Switch to private-llama when gateway healthy: ptm private-llama llama-3.2-70b
       manual_providers: {
-        ptm: { provider_id: "groq", model_id: "openai/gpt-oss-20b" },
-        vcm: { provider_id: "openrouter", model_id: "deepseek/deepseek-r1-free" },
-        fcm: { provider_id: "openrouter", model_id: "qwen/qwen-2.5-7b-instruct-free" },
+        ptm: finalPtm,
+        vcm: finalVcm,
+        fcm: finalFcm,
       },
       merge_style: "hybrid",
-      enable_fast_draft: true,
+      enable_fast_draft: !!finalFcm,
       router_mode: "manual" as const,
       ephemeral_keys: bodyKeys,
     };

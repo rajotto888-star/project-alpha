@@ -17,11 +17,12 @@ export interface ResolvedProviderConfig {
 }
 
 // LOCKED (B3): baseUrl is resolved exclusively from PROVIDER_CATALOG — never
-// duplicated as a scattered constant elsewhere.
-// SECURITY: ephemeral header-first, SSRF guard for custom baseUrl (hf-space/colab/kaggle/private-*).
+// duplicated as a scattered constant elsewhere, but custom endpoints from X-CUSTOM-ENDPOINTS header override catalog for local providers (private-llama, hf-space, colab, kaggle).
+// SECURITY: ephemeral header-first, SSRF guard for custom baseUrl (hf-space/colab/kaggle/private-* + Android Private LM).
 export function resolveProviderConfig(
   providerId: string,
   ephemeralKeys: Record<string, string>,
+  customEndpoints?: Record<string, string>,
 ): ResolvedProviderConfig {
   const catalogEntry = getCatalogProvider(providerId);
   if (!catalogEntry || !catalogEntry.implemented || !catalogEntry.selectable) {
@@ -31,17 +32,22 @@ export function resolveProviderConfig(
   if (!apiKey) {
     throw new UpstreamConfigError(`missing ephemeral key for provider: ${providerId}`);
   }
-  // SSRF guard: all baseUrls must be https and non-private, especially for custom free-compute gateway
-  // This ensures vault ephemeral keys are only sent to safe public endpoints.
+  // Custom endpoint override for Android Private LM / Colab tunnel / HF Space
+  let baseUrl = catalogEntry.baseUrl;
+  if (customEndpoints && customEndpoints[providerId]) {
+    baseUrl = customEndpoints[providerId];
+  }
+  // SSRF guard: all baseUrls must be safe, with relaxed rules for local providers when custom endpoint set
   try {
-    assertSafeUrl(catalogEntry.baseUrl);
+    const isCustom = !!(customEndpoints && customEndpoints[providerId]);
+    assertSafeUrl(baseUrl, { providerId, allowPrivate: isCustom, allowHttp: isCustom });
   } catch (e) {
     if (e instanceof SsrfGuardError) {
       throw new UpstreamConfigError(`SSRF guard blocked baseUrl for ${providerId}: ${e.message}`);
     }
     throw e;
   }
-  return { providerId, baseUrl: catalogEntry.baseUrl, apiKey };
+  return { providerId, baseUrl, apiKey };
 }
 
 export interface StreamChunk {

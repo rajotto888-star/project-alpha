@@ -16,10 +16,11 @@ export interface RunCommanderArgs {
   userId: string;
   db: D1Database;
   signal: AbortSignal;
+  customEndpoints?: Record<string, string>;
 }
 
 export async function runCommander(args: RunCommanderArgs): Promise<void> {
-  const { emitter, payload, ephemeralKeys, userId, db, signal } = args;
+  const { emitter, payload, ephemeralKeys, userId, db, signal, customEndpoints } = args;
   const requestId = crypto.randomUUID();
   const startedAt = Date.now();
   const latencies: Record<string, number> = {};
@@ -64,7 +65,7 @@ export async function runCommander(args: RunCommanderArgs): Promise<void> {
     const fcmStart = Date.now();
     try {
       const runFcm = (async () => {
-        const config = resolveProviderConfig(fcmRef.provider_id, ephemeralKeys);
+        const config = resolveProviderConfig(fcmRef.provider_id, ephemeralKeys, customEndpoints);
         for await (const chunk of streamOpenAICompat(config, fcmRef.model_id, messages, fcmController.signal)) {
           emitter.chunk("fcm", chunk.delta);
         }
@@ -113,6 +114,7 @@ export async function runCommander(args: RunCommanderArgs): Promise<void> {
       modelId: ptmRef.model_id,
       messages,
       ephemeralKeys,
+      customEndpoints,
       parentSignal: signal,
       // PTM streams, so usage only exists if we ask for it. Opted in here and
       // nowhere else — FCM keeps the canonical request body.
@@ -170,6 +172,7 @@ export async function runCommander(args: RunCommanderArgs): Promise<void> {
       originalMessages: messages,
       ptmAnswer,
       ephemeralKeys,
+      customEndpoints,
       parentSignal: signal,
     });
   } catch (err) {

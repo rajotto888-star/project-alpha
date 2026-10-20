@@ -48,6 +48,20 @@ chat.post("/stream", async (c) => {
     throw err;
   }
 
+  // Custom endpoints for Android Private LM / Colab tunnel / HF Space (base64 JSON in header)
+  let customEndpoints: Record<string, string> | undefined;
+  const customHeader = c.req.header("X-CUSTOM-ENDPOINTS");
+  if (customHeader) {
+    try {
+      const decoded = JSON.parse(atob(customHeader)) as Record<string, string>;
+      if (typeof decoded === "object" && decoded !== null) {
+        customEndpoints = decoded;
+      }
+    } catch {
+      // Ignore invalid custom endpoints header - not critical
+    }
+  }
+
   // A3 LOCKED: every selected role must have a matching ephemeral key before
   // the SSE stream opens — fail fast with HTTP 400, never mid-stream.
   const requiredRoles = [
@@ -73,6 +87,7 @@ chat.post("/stream", async (c) => {
         emitter,
         payload,
         ephemeralKeys,
+        customEndpoints,
         userId,
         db: c.env.DB,
         signal: abortController.signal,

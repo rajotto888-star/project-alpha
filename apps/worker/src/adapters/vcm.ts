@@ -90,6 +90,7 @@ export interface VcmRunArgs {
   ephemeralKeys: Record<string, string>;
   parentSignal: AbortSignal;
   maxAttempts?: number;
+  customEndpoints?: Record<string, string>;
 }
 
 export async function runVcmWithRetries(args: VcmRunArgs): Promise<VerifierResult> {
@@ -109,7 +110,7 @@ export async function runVcmWithRetries(args: VcmRunArgs): Promise<VerifierResul
     args.parentSignal.addEventListener("abort", onParentAbort);
     const timer = setTimeout(() => controller.abort(), VCM_TIMEOUT_MS);
     try {
-      const config = resolveProviderConfig(args.providerId, args.ephemeralKeys);
+      const config = resolveProviderConfig(args.providerId, args.ephemeralKeys, args.customEndpoints);
       const res = await fetch(`${config.baseUrl}/chat/completions`, {
         method: "POST",
         signal: controller.signal,

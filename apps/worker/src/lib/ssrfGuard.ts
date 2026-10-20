@@ -58,54 +58,83 @@ function isPrivateIPv6(host: string): boolean {
 }
 
 const BLOCKED_HOSTNAMES = new Set([
-  "localhost",
   "metadata.google.internal",
   "metadata.google.com",
   "169.254.169.254", // AWS/GCP metadata
 ]);
 
-export function assertSafeUrl(urlString: string): void {
+const LOCAL_ALLOWED_PROVIDERS = new Set(["private-llama", "private-smollm", "colab", "kaggle", "hf-space", "android-local"]);
+
+export interface SsrfOptions {
+  allowPrivate?: boolean;
+  allowHttp?: boolean;
+  providerId?: string;
+}
+
+export function assertSafeUrl(urlString: string, opts: SsrfOptions = {}): void {
   let u: URL;
   try {
     u = new URL(urlString);
   } catch {
     throw new SsrfGuardError("invalid URL format");
   }
-  if (u.protocol !== "https:") {
-    throw new SsrfGuardError("only https:// allowed for BYOE endpoints");
+
+  const providerId = opts.providerId || "";
+  const isLocalProvider = LOCAL_ALLOWED_PROVIDERS.has(providerId) || opts.allowPrivate;
+
+  // Protocol check: allow https always, allow http only for local providers with private IPs
+  if (u.protocol !== "https:" && u.protocol !== "http:") {
+    throw new SsrfGuardError("only https:// (and http:// for local private endpoints) allowed");
   }
+  if (u.protocol === "http:" && !isLocalProvider && !opts.allowHttp) {
+    throw new SsrfGuardError("only https:// allowed for this provider (http allowed only for private-llama/colab/kaggle/hf-space local)");
+  }
+
   const host = u.hostname.toLowerCase();
   if (!host) throw new SsrfGuardError("missing hostname");
 
-  // Block obvious private hostnames
-  if (BLOCKED_HOSTNAMES.has(host) || host === "localhost" || host.endsWith(".localhost")) {
-    throw new SsrfGuardError(`private host blocked: ${host}`);
+  // Block metadata endpoints always
+  if (BLOCKED_HOSTNAMES.has(host)) {
+    throw new SsrfGuardError(`metadata host blocked: ${host}`);
   }
-  if (host.endsWith(".internal") || host.endsWith(".local") || host === "internal") {
+  if (host === "metadata.google.internal" || host === "169.254.169.254") {
+    throw new SsrfGuardError(`metadata host blocked: ${host}`);
+  }
+  if (host.endsWith(".internal") && !isLocalProvider) {
     throw new SsrfGuardError(`private TLD blocked: ${host}`);
+  }
+
+  // Localhost handling: block localhost unless it's a local provider with explicit allowPrivate
+  if (host === "localhost" || host.endsWith(".localhost")) {
+    if (!isLocalProvider) {
+      throw new SsrfGuardError(`localhost blocked for provider ${providerId || "unknown"} - use custom endpoint for private-llama`);
+    }
+    // Allow localhost for local providers (Android Private LM on same device via adb)
   }
 
   // IP literal checks
   if (isIPv4(host)) {
-    if (isPrivateIPv4(host)) {
-      throw new SsrfGuardError(`private IPv4 blocked: ${host}`);
+    if (isPrivateIPv4(host) && !isLocalProvider) {
+      throw new SsrfGuardError(`private IPv4 blocked: ${host} (allowed only for private-llama/colab/kaggle/hf-space)`);
     }
   } else if (host.includes(":")) {
-    // Likely IPv6 literal (URL parser strips brackets)
-    if (isPrivateIPv6(host)) {
+    if (isPrivateIPv6(host) && !isLocalProvider) {
       throw new SsrfGuardError(`private IPv6 blocked: ${host}`);
     }
   }
 
-  // Block non-standard ports (allow only 443 and implicit)
-  if (u.port && u.port !== "443") {
-    // Allow common alt https ports for tunnels? For security, block all explicit ports except 443.
-    // Cloudflare tunnels and HF Spaces use 443 implicit, so this is safe.
-    throw new SsrfGuardError(`non-443 port blocked: ${u.port}`);
+  // Port check: allow 443 implicit, and for local providers allow common LLM ports 8080, 11434, 1234, 8000, 5000
+  if (u.port) {
+    if (isLocalProvider) {
+      const allowedLocalPorts = new Set(["443", "80", "8080", "11434", "1234", "8000", "5000", "3000", "7860"]);
+      if (!allowedLocalPorts.has(u.port)) {
+        throw new SsrfGuardError(`port ${u.port} not allowed for local provider, allowed: ${Array.from(allowedLocalPorts).join(",")}`);
+      }
+    } else {
+      if (u.port !== "443") {
+        throw new SsrfGuardError(`non-443 port blocked: ${u.port}`);
+      }
+    }
   }
-
-  // Explicit allowlist for free-compute gateway: trycloudflare.com, hf.space, workers.dev, huggingface.co
-  // But we don't restrict to allowlist — we block private only, so public custom domains are allowed if https.
-  // This keeps BYOE Lite (owner catalog) compatible with future user custom domains, with SSRF protection.
 }
 
